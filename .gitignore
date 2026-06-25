@@ -1,0 +1,43 @@
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage/
+htmlcov/
+
+# Python packaging and virtual environments
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+
+# Generated SBOM output
+sbom/
+*.cyclonedx.json
+*.spdx.json
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
