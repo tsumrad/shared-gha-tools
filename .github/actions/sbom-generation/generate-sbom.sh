@@ -14,6 +14,11 @@ set -euo pipefail
 SOURCE="${1:?source is required}"
 OUTPUT_PREFIX="${2:?output prefix is required}"
 ECOSYSTEMS_JSON="${3:-[]}"
+OUTPUT_DIR="$(dirname "$OUTPUT_PREFIX")"
+
+if [ "$OUTPUT_DIR" != "." ]; then
+	mkdir -p "$OUTPUT_DIR"
+fi
 
 log() {
 	echo "[sbom] $*"
