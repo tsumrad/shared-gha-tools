@@ -12,15 +12,13 @@ SERIAL="${3:?serial is required}"
 
 CDX_FILE="${OUTPUT_PREFIX}.cyclonedx.json"
 
-# Fail clearly if generation did not create the expected CycloneDX file.
 if [ ! -f "$CDX_FILE" ]; then
-	echo "Expected file missing: $CDX_FILE" >&2
-	exit 1
+  echo "Expected file missing: $CDX_FILE" >&2
+  exit 1
 fi
 
-# Stabilize metadata used for reproducible artifacts and comparisons.
 jq --sort-keys '. as $root | if $root.metadata then .metadata.timestamp = $createdAt else . end | .serialNumber = $serial' \
-	--arg createdAt "$CREATED_AT" \
-	--arg serial "$SERIAL" \
-	"$CDX_FILE" >"${CDX_FILE}.tmp"
+  --arg createdAt "$CREATED_AT" \
+  --arg serial "$SERIAL" \
+  "$CDX_FILE" > "${CDX_FILE}.tmp"
 mv "${CDX_FILE}.tmp" "$CDX_FILE"
