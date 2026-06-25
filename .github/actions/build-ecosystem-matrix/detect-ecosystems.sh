@@ -74,7 +74,7 @@ detect_one() {
 
 # Manifest-based ecosystem definitions.
 detect_one node -name package-lock.json -o -name npm-shrinkwrap.json -o -name yarn.lock -o -name pnpm-lock.yaml -o -name package.json
-detect_one python -name 'requirements*.txt' -o -name pyproject.toml -o -name poetry.lock -o -name Pipfile.lock -o -name setup.py
+detect_one python -name 'requirements*.txt' -o -name 'requirements*.lock' -o -name pyproject.toml -o -name poetry.lock -o -name Pipfile.lock -o -name setup.py
 detect_one java -name pom.xml -o -name build.gradle -o -name build.gradle.kts -o -name settings.gradle -o -name settings.gradle.kts
 detect_one dotnet -name '*.sln' -o -name '*.csproj' -o -name '*.fsproj' -o -name '*.vbproj' -o -name Directory.Packages.props
 

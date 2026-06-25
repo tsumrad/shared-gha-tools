@@ -14,6 +14,10 @@ inputs:
   scan_label:
     description: Label used to create deterministic serial values per scan.
     required: true
+  ecosystems:
+    description: JSON array of ecosystems included in this scan target.
+    required: false
+    default: '[]'
 
 runs:
   using: composite
@@ -22,6 +26,13 @@ runs:
       uses: anchore/sbom-action/download-syft@v0
       with:
         syft-version: ${{ inputs.syft_version }}
+
+    - name: Install cyclonedx-py
+      if: contains(fromJson(inputs.ecosystems), 'python')
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pip install --upgrade cyclonedx-bom
 
     - name: Prepare deterministic metadata
       id: deterministic
@@ -46,7 +57,10 @@ runs:
         set -euo pipefail
         echo "Generating SBOM from source: ${{ inputs.source }}"
         echo "Writing SBOM output prefix: ${{ inputs.output_prefix }}"
-        bash "$GITHUB_ACTION_PATH/generate-sbom.sh" "${{ inputs.source }}" "${{ inputs.output_prefix }}"
+        bash "$GITHUB_ACTION_PATH/generate-sbom.sh" \
+          "${{ inputs.source }}" \
+          "${{ inputs.output_prefix }}" \
+          '${{ inputs.ecosystems }}'
 
     - name: Normalize SBOM
       shell: bash

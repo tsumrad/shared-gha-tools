@@ -169,6 +169,7 @@ jobs:
           output_prefix: ${{ matrix.output_prefix }}
           syft_version: ${{ needs.prepare-matrix.outputs.syft_version }}
           scan_label: ${{ matrix.scan_label }}
+          ecosystems: ${{ toJson(matrix.ecosystems) }}
 
       - name: Verify SBOM output
         shell: bash
