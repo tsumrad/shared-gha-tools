@@ -111,6 +111,7 @@ jobs:
         env:
           DETECTED: ${{ steps.matrix.outputs.detected }}
           TARGETS: ${{ steps.matrix.outputs.targets }}
+          MATRIX: ${{ steps.matrix.outputs.matrix }}
         run: |
           set -euo pipefail
           # Add a human-readable summary next to the machine-readable matrix
@@ -121,6 +122,11 @@ jobs:
           targets_summary="$(jq -r 'join(", ")' <<< "$TARGETS")"
           echo "Detected ecosystems: $detected_summary" >> "$GITHUB_STEP_SUMMARY"
           echo "Selected targets: $targets_summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "Matrix entries:"
+          jq -c '.include[]' <<< "$MATRIX"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Matrix entries:" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.include[] | "- `scan_label=\(.scan_label)`, `source=\(.source)`, `output_prefix=\(.output_prefix)`, `ecosystems=\(.ecosystems | join(","))`"' <<< "$MATRIX" >> "$GITHUB_STEP_SUMMARY"
 
   generate-sbom:
     name: Generate SBOM (${{ matrix.scan_label }})
@@ -141,6 +147,19 @@ jobs:
           # paths and source paths refer to the same repository contents.
           token: ${{ github.token }}
           fetch-depth: 0
+
+      - name: Log SBOM matrix entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'SBOM matrix entry:'
+          jq -n \
+            --arg scan_kind '${{ matrix.scan_kind }}' \
+            --arg scan_label '${{ matrix.scan_label }}' \
+            --arg source '${{ matrix.source }}' \
+            --arg output_prefix '${{ matrix.output_prefix }}' \
+            --argjson ecosystems '${{ toJson(matrix.ecosystems) }}' \
+            '{scan_kind:$scan_kind, scan_label:$scan_label, source:$source, output_prefix:$output_prefix, ecosystems:$ecosystems}'
 
       - name: Run SBOM core action
         uses: tsumrad/shared-gha-tools/.github/actions/sbom-generation@sbom-generation
@@ -192,6 +211,19 @@ jobs:
         with:
           token: ${{ github.token }}
           fetch-depth: 0
+
+      - name: Log dependency graph matrix entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'Dependency graph matrix entry:'
+          jq -n \
+            --arg scan_kind '${{ matrix.scan_kind }}' \
+            --arg scan_label '${{ matrix.scan_label }}' \
+            --arg source '${{ matrix.source }}' \
+            --arg output_prefix '${{ matrix.output_prefix }}' \
+            --argjson ecosystems '${{ toJson(matrix.ecosystems) }}' \
+            '{scan_kind:$scan_kind, scan_label:$scan_label, source:$source, output_prefix:$output_prefix, ecosystems:$ecosystems}'
 
       - name: Refresh GitHub Dependency Graph
         uses: tsumrad/shared-gha-tools/.github/actions/refresh-dependency-graph@sbom-generation

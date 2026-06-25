@@ -44,6 +44,8 @@ runs:
         SOURCE_DATE_EPOCH: ${{ steps.deterministic.outputs.source_date_epoch }}
       run: |
         set -euo pipefail
+        echo "Generating SBOM from source: ${{ inputs.source }}"
+        echo "Writing SBOM output prefix: ${{ inputs.output_prefix }}"
         bash "$GITHUB_ACTION_PATH/generate-sbom.sh" "${{ inputs.source }}" "${{ inputs.output_prefix }}"
 
     - name: Normalize SBOM
