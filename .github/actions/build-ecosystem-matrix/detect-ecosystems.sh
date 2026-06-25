@@ -66,8 +66,8 @@ detect_one() {
 		detected+=("$ecosystem")
 		while IFS= read -r match; do
 			[ -n "$match" ] || continue
-			# Store both the manifest directory and file for downstream ecosystem tools.
-			printf '%s\t%s\t%s\n' "$ecosystem" "$(dirname "$match")" "$match" >>"$findings_file"
+			# Store the manifest directory for downstream ecosystem tools.
+			printf '%s\t%s\n' "$ecosystem" "$(dirname "$match")" >>"$findings_file"
 		done <<<"$matches"
 	fi
 }
@@ -77,12 +77,11 @@ detect_one node -name package-lock.json -o -name npm-shrinkwrap.json -o -name ya
 detect_one python -name 'requirements*.txt' -o -name pyproject.toml -o -name poetry.lock -o -name Pipfile.lock -o -name setup.py
 detect_one java -name pom.xml -o -name build.gradle -o -name build.gradle.kts -o -name settings.gradle -o -name settings.gradle.kts
 detect_one dotnet -name '*.sln' -o -name '*.csproj' -o -name '*.fsproj' -o -name '*.vbproj' -o -name Directory.Packages.props
-detect_one container -name Dockerfile -o -name Containerfile -o -name '*.Dockerfile'
 
 # Emit stable JSON with unique findings and ecosystem names.
 jq -Rn \
 	--argjson any "$any" \
-	--slurpfile findings <(sort -u "$findings_file" | jq -R 'split("\t") | {ecosystem: .[0], path: .[1], manifest: .[2]}') '
+	--slurpfile findings <(sort -u "$findings_file" | jq -R 'split("\t") | {ecosystem: .[0], path: .[1]}') '
   {
     any: $any,
     list: ($findings | map(.ecosystem) | unique),

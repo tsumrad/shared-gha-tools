@@ -73,7 +73,6 @@ sbom)
           | group_by(.path)[]
           | {
               path: .[0].path,
-              manifests: (map(.manifest) | unique),
               label_path: (.[0].path | relative_to_root($sourcePath)),
               ecosystems: (map(.ecosystem) | unique)
             }
@@ -82,11 +81,7 @@ sbom)
           | {
               scan_kind: "filesystem",
               scan_label: .label,
-              source: (
-                if (.ecosystems == ["python"]) then .manifests[0]
-                else "dir:" + .path
-                end
-              ),
+              source: ("dir:" + .path),
               output_prefix: ("sbom/" + .label),
               ecosystems: .ecosystems
             }]
